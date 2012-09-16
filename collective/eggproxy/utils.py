@@ -37,6 +37,9 @@ from collective.eggproxy.config import config
 ALWAYS_REFRESH = config.getboolean('eggproxy', 'always_refresh')
 EGGS_DIR = config.get("eggproxy", "eggs_directory")
 INDEX_URL = config.get("eggproxy", "index")
+IGNORED_EXTENSIONS = [x.strip() for x in
+                      config.get("eggproxy", "ignored_extensions").split(',')
+                      if x.strip()]
 #INDEX is defined *after* the PackageIndex class.
 
 
@@ -111,6 +114,23 @@ class IndexProxy(object):
     def __init__(self, index=None):
         self.index = index or INDEX
 
+    def _get_ignored_extensions(self):
+        if not hasattr(self, '_ignored_extensions'):
+            self._ignored_extensions = IGNORED_EXTENSIONS
+        return self._ignored_extensions
+
+    def _set_ignored_extensions(self, value):
+        self._ignored_extensions = value
+
+    ignored_extensions = property(_get_ignored_extensions,
+                                  _set_ignored_extensions)
+
+    def is_ignored_filename(self, filename):
+        for extension in self.ignored_extensions:
+            if filename.endswith(extension):
+                return True
+        return False
+
     def updateBaseIndex(self, eggs_dir=EGGS_DIR):
         """Update base index.html
         """
@@ -159,6 +179,8 @@ class IndexProxy(object):
                 continue
 
             filename, md5 = egg_info_for_url(dist.location)
+            if self.is_ignored_filename(filename):
+                continue
             print >> html, (
                 '<a href="%s#%s" rel="download">%s</a><br />'
                 % (filename, md5, filename)
