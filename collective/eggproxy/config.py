@@ -40,6 +40,7 @@ config.set("eggproxy", "listen", '127.0.0.1')
 config.set("eggproxy", "port", '8888')
 config.set("eggproxy", "always_refresh", '0')
 config.set("eggproxy", "timeout", '3')
+config.set("eggproxy", "ignored_extensions", '')
 
 if os.path.exists(CONFIG_FILE):
     config.readfp(open(CONFIG_FILE))

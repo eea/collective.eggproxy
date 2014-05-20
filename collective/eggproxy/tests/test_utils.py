@@ -44,3 +44,15 @@ def test_package_case_sensitive():
 
     page = open(os.path.join(dirname, 'index.html')).read()
     assert '<html><head><title>Paste</title></head>' in page
+
+@with_setup(setup_func, teardown_func)
+def test_ignored_extensions():
+    filename = os.path.join(tempdir, 'Paste', 'index.html')
+    # Not filtering
+    index.ignored_extensions = []
+    index.updatePackageIndex('Paste', tempdir)
+    assert '.egg' in open(filename).read()
+    # Filtering
+    index.ignored_extensions = ['.egg']
+    index.updatePackageIndex('Paste', tempdir)
+    assert '.egg' not in open(filename).read()
