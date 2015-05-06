@@ -40,7 +40,7 @@ def fixup_handler(req):
         return apache.DECLINED
 
     req.handler = 'mod_python'
-    req.add_handler('PythonHandler', modpython_handler)
+    req.add_handler('PythonHandler', 'collective.eggproxy.apache_handler::modpython_handler')
     return apache.OK
 
 def modpython_handler(req):
